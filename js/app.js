@@ -7,12 +7,14 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 	$scope.members = registrationSvc.getMembers();
 	$scope.events = registrationSvc.getEvents();
 	$scope.currentEvent = { id: 0};
+
 	$scope.showAttendeeList = function() { return $scope.currentEvent.id != 0; };
 
 	$scope.createEvent = function() {
-		console.dir($scope.newEvent);
 		registrationSvc.addEvent($scope.newEvent);
 		$scope.events = registrationSvc.getEvents();
+		$scope.currentEvent = $scope.newEvent;
+		$scope.newEvent = {};
 	}
 
 	$scope.selectEvent = function(event) {
@@ -43,7 +45,20 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 		$scope.currentEvent.attendees.push(attendee);
 	}
 
+	$scope.isAttending = function(attendees) {
+		return function(member) {
+			
+			if(attendees == undefined) { return true; }
 
+			for(var i =0;i<attendees.length;i++) {
+				if(attendees[i].email == member.email) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+	}
 
 }]);
 
@@ -77,9 +92,9 @@ raffleAppServices.factory('registrationSvc',
 								{ id: 3, date: '7/10/2014', speaker: 'Mike Roth', topic: 'Stuff', location: 'San Bernardino', attendees: [] }
 									],
 					__members: [
-						{ firstName: 'Dustin', lastName:'Davis', email:'dd@dd.com'},
-						{ firstName: 'John', lastName:'Smith', email:'js@dd.com'},
-						{ firstName: 'Mary', lastName:'Smith', email:'ms@dd.com'}
+						{ id: 1, firstName: 'Dustin', lastName:'Davis', email:'dd@dd.com'},
+						{ id: 2, firstName: 'John', lastName:'Smith', email:'js@dd.com'},
+						{ id: 3, firstName: 'Mary', lastName:'Smith', email:'ms@dd.com'}
 					],
 					getEvents: function() {
 								return	this.__events;
@@ -96,8 +111,14 @@ raffleAppServices.factory('registrationSvc',
 
 	);
 
-//ROUTING
+
+
 var raffleApp = angular.module('ugRaffleApp', ['ngRoute', 'raffleAppControllers','raffleAppServices']);
+
+//FILTERS
+
+
+//ROUTING
 
 raffleApp.config(['$routeProvider',
 	function($routeProvider) {
@@ -111,6 +132,8 @@ raffleApp.config(['$routeProvider',
 	}]
 
 );
+
+
 
 
 

@@ -42,12 +42,12 @@
 					<h4>Existing Members</h4>
 
 					<ul class="list-group members">
-						<li class="list-group-item" ng-repeat="member in members"> {{member.lastName}}, {{member.firstName}} 
+						<li class="list-group-item" ng-repeat="member in (members | filter:isAttending(currentEvent.attendees))"> {{member.lastName}}, {{member.firstName}} 
 							<span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
 						</li>
 					</ul>
 				</div>
-				<div class="attendees col-md-4">
+				<div class="attendees col-md-5">
 					<h4>Event Attendees</h4>
 
 
