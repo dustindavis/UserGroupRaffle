@@ -1,0 +1,74 @@
+
+<h2 >Event Registration</h2>
+
+<div class="container">
+	<div class="row">
+
+
+		<div class="col-md-3">
+			
+
+			<h4>Select Event</h4>
+			<ul class="list-group storedMeetings">
+				<li class="list-group-item" ng-repeat="event in events" ng-click="selectEvent(event)">{{event.topic}}<br />{{event.date}} - {{event.speaker}}</li>
+			</ul>
+
+
+			<h4>Create Event</h4>
+			<input type="text" placeholder="Meeting Date" value="" ng-model="newEvent.date" /><br/>
+			<input type="text" placeholder="Speaker" value="" ng-model="newEvent.speaker" /><br/>
+			<input type="text" placeholder="Topic" value="" ng-model="newEvent.topic" /><br/>
+			<input type="text" placeholder="Location" value="" ng-model="newEvent.location" /><br/>
+			<input type="button" ng-click="createEvent()" value="Create" />
+
+		</div>
+
+		
+		<div ng-show="showAttendeeList()" class="attendees col-md-8">
+					<h3>{{currentEvent.topic}}</h3>
+
+			<div class="row">
+				<div class="attendees col-md-4" >
+
+				<h4>New Attendee</h4>
+					<div class="addNewMember">
+						<input type="text" placeholder="First Name" value="" ng-model="attendee.firstName"/><br/>
+						<input type="text" placeholder="Last Name" value="" ng-model="attendee.lastName"/><br/>
+						<input type="text" placeholder="Email Address" value="" ng-model="attendee.email"/><br/>
+						<input type="button" ng-click="createAttendee(attendee)" value="Create" />
+
+					</div>
+
+					<h4>Existing Members</h4>
+
+					<ul class="list-group members">
+						<li class="list-group-item" ng-repeat="member in members"> {{member.lastName}}, {{member.firstName}} 
+							<span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
+						</li>
+					</ul>
+				</div>
+				<div class="attendees col-md-4">
+					<h4>Event Attendees</h4>
+
+
+					<ul class="list-group attending">
+						<li class="list-group-item" ng-repeat="attendee in currentEvent.attendees" ng-click="removeAttendee(attendee)">
+							<span class="glyphicon glyphicon-remove-circle" ng-click="removeAttendee(attendee)"></span>
+
+						 {{attendee.lastName}}, {{attendee.firstName}} 
+
+						 <span class="pull-right">
+							<span class="glyphicon glyphicon-chevron-down" ng-click="adjustEntries(attendee,-1)"></span>
+						 	<input type="text" ng-model="attendee.entries" style="width: 25px"/>
+							<span class="glyphicon glyphicon-chevron-up" ng-click="adjustEntries(attendee,1)"></span>
+
+						</span>
+						</li>
+
+					</ul>
+				</div>
+				
+		</div>
+	<div>
+	</div>
+</div>
