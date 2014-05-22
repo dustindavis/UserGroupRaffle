@@ -7,13 +7,15 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 	$scope.members = registrationSvc.getMembers();
 	$scope.events = registrationSvc.getEvents();
 	$scope.currentEvent = { id: 0};
+	$scope.memberInputDisplay = 1;
+	$scope.eventInputDisplay = 1;
 
 	$scope.showAttendeeList = function() { return $scope.currentEvent.id != 0; };
 
-	$scope.createEvent = function() {
-		registrationSvc.addEvent($scope.newEvent);
+	$scope.createEvent = function(newEvent) {
+		registrationSvc.addEvent(newEvent);
 		$scope.events = registrationSvc.getEvents();
-		$scope.currentEvent = $scope.newEvent;
+		$scope.currentEvent = newEvent;
 		$scope.newEvent = {};
 	}
 
@@ -25,9 +27,11 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 		addAttendeeToEvent(attendee);
 	}
 
-	$scope.createAttendee = function(attendee) {
-		addAttendeeToEvent(attendee);
-		$scope.attendee = {};
+	$scope.createAttendee = function(newAttendee) {
+		addAttendeeToEvent(newAttendee);
+		registrationSvc.createMember(newAttendee);
+		$scope.members = registrationSvc.getMembers();
+		$scope.newAttendee = {};
 	}
 
 	$scope.adjustEntries = function(attendee, value) {
@@ -36,7 +40,12 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 
 		if(attendee.entries < 0) { attendee.entries = 0; }
 
+	}
 
+	$scope.removeAttendee = function(attendee) {
+		var position = $scope.currentEvent.attendees.indexOf(attendee);
+
+		if ( ~position ) $scope.currentEvent.attendees.splice(position, 1);
 	}
 
 	function addAttendeeToEvent(attendee) {
@@ -104,6 +113,9 @@ raffleAppServices.factory('registrationSvc',
 					},
 					getMembers: function() {
 						return this.__members;
+					},
+					createMember: function(member) {
+						this.__members.push(member);
 					}
 
 				};

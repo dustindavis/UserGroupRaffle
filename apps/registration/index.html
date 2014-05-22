@@ -2,57 +2,144 @@
 <h2 >Event Registration</h2>
 
 <div class="container">
+
+	<div class="row">
+		<div class="col-md-3">
+			<h4>&nbsp;</h4>
+		</div>
+		<div class="col-md-9" ng-show="showAttendeeList()">
+				<div class="attendees col-md-4" >
+					<h4>Event: {{currentEvent.topic}}</h4>
+				</div>
+				<div class="attendees col-md-5" >
+					<h4>Attendees</h4>
+				</div>
+		</div>
+	</div>
+
 	<div class="row">
 
 
 		<div class="col-md-3">
-			
+			<div class="btn-group">
+				        <label class="btn btn-sm btn-default" ng-model="eventInputDisplay" btn-radio="'1'" ng-click="eventInputDisplay = 1">Events</label>
+				        <label class="btn btn-sm btn-default" ng-model="eventInputDisplay" btn-radio="'2'" ng-click="eventInputDisplay = 2">Create</label>
+				    </div>
 
-			<h4>Select Event</h4>
-			<ul class="list-group storedMeetings">
+			
+			<ul class="list-group storedMeetings" ng-show="eventInputDisplay == 1">
 				<li class="list-group-item" ng-repeat="event in events" ng-click="selectEvent(event)">{{event.topic}}<br />{{event.date}} - {{event.speaker}}</li>
 			</ul>
 
 
-			<h4>Create Event</h4>
-			<input type="text" placeholder="Meeting Date" value="" ng-model="newEvent.date" /><br/>
-			<input type="text" placeholder="Speaker" value="" ng-model="newEvent.speaker" /><br/>
-			<input type="text" placeholder="Topic" value="" ng-model="newEvent.topic" /><br/>
-			<input type="text" placeholder="Location" value="" ng-model="newEvent.location" /><br/>
-			<input type="button" ng-click="createEvent()" value="Create" />
+			<form class="form-horizontal" ng-show="eventInputDisplay == '2'">
+				<fieldset>
+
+				<div class="control-group">
+				  <label class="control-label" for="txtfn">First Name</label>
+				  <div class="controls">
+				   <input type="text" placeholder="Meeting Date" value="" ng-model="newEvent.date" />
+				    
+				  </div>
+				</div>
+
+				<div class="control-group">
+				  <label class="control-label" for="txtln">Last Name</label>
+				  <div class="controls">
+				   <input type="text" placeholder="Speaker" value="" ng-model="newEvent.speaker" />
+				    
+				  </div>
+				</div>
+
+				<div class="control-group">
+				  <label class="control-label" for="txtem">Email</label>
+				  <div class="controls">
+				    <input type="text" placeholder="Topic" value="" ng-model="newEvent.topic" />
+				    
+				  </div>
+				</div>
+
+				<div class="control-group">
+				  <label class="control-label" for="txtem">Email</label>
+				  <div class="controls">
+				    <input type="text" placeholder="Location" value="" ng-model="newEvent.location" />
+				    
+				  </div>
+				</div>
+
+				<div class="control-group">
+				  <label class="control-label" for="btnSave"></label>
+				  <div class="controls">
+				    <button id="btnSave" name="btnSave" class="btn btn-sm btn-success" ng-click="createEvent(newEvent)">Create</button>
+				    <button id="btnClear" name="btnClear" class="btn btn-sm btn-warning" ng-click="newEvent = {}">Clear</button>
+				  </div>
+				</div>
+
+				</fieldset>
+			</form>
+		
 
 		</div>
 
 		
-		<div ng-show="showAttendeeList()" class="attendees col-md-8">
-					<h3>{{currentEvent.topic}}</h3>
+		<div ng-show="showAttendeeList()" class="attendees col-md-9">
+			
 
-			<div class="row">
 				<div class="attendees col-md-4" >
+					<div class="btn-group">
+				        <label class="btn btn-sm btn-default" ng-model="memberInputDisplay" btn-radio="'1'" ng-click="memberInputDisplay = 1">Members</label>
+				        <label class="btn btn-sm btn-default" ng-model="memberInputDisplay" btn-radio="'2'" ng-click="memberInputDisplay = 2">New</label>
+				    </div>
 
-				<h4>New Attendee</h4>
-					<div class="addNewMember">
-						<input type="text" placeholder="First Name" value="" ng-model="attendee.firstName"/><br/>
-						<input type="text" placeholder="Last Name" value="" ng-model="attendee.lastName"/><br/>
-						<input type="text" placeholder="Email Address" value="" ng-model="attendee.email"/><br/>
-						<input type="button" ng-click="createAttendee(attendee)" value="Create" />
+					<form class="form-horizontal" ng-show="memberInputDisplay == '2'">
+						<fieldset>
 
-					</div>
+						<div class="control-group">
+						  <label class="control-label" for="txtfn">First Name</label>
+						  <div class="controls">
+						    <input id="txtfn" name="txtfn" type="text" placeholder="First Name" class="input-small" ng-model="newAttendee.firstName">
+						    
+						  </div>
+						</div>
 
-					<h4>Existing Members</h4>
+						<div class="control-group">
+						  <label class="control-label" for="txtln">Last Name</label>
+						  <div class="controls">
+						    <input id="txtln" name="txtln" type="text" placeholder="Last Name" class="input-small" ng-model="newAttendee.lastName">
+						    
+						  </div>
+						</div>
 
-					<ul class="list-group members">
+						<div class="control-group">
+						  <label class="control-label" for="txtem">Email</label>
+						  <div class="controls">
+						    <input id="txtem" name="txtem" type="text" placeholder="Email Address" class="input-medium" ng-model="newAttendee.email">
+						    
+						  </div>
+						</div>
+
+						<div class="control-group">
+						  <label class="control-label" for="btnSave"></label>
+						  <div class="controls">
+						    <button id="btnSave" name="btnSave" class="btn btn-sm btn-success" ng-click="createAttendee(newAttendee)">Add</button>
+						    <button id="btnClear" name="btnClear" class="btn btn-sm btn-warning" ng-click="newAttendee = {}">Clear</button>
+						  </div>
+						</div>
+
+						</fieldset>
+					</form>
+
+
+					<ul class="list-group members" ng-show="memberInputDisplay == '1'">
 						<li class="list-group-item" ng-repeat="member in (members | filter:isAttending(currentEvent.attendees))"> {{member.lastName}}, {{member.firstName}} 
 							<span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
 						</li>
 					</ul>
 				</div>
 				<div class="attendees col-md-5">
-					<h4>Event Attendees</h4>
-
 
 					<ul class="list-group attending">
-						<li class="list-group-item" ng-repeat="attendee in currentEvent.attendees" ng-click="removeAttendee(attendee)">
+						<li class="list-group-item" ng-repeat="attendee in currentEvent.attendees">
 							<span class="glyphicon glyphicon-remove-circle" ng-click="removeAttendee(attendee)"></span>
 
 						 {{attendee.lastName}}, {{attendee.firstName}} 
@@ -68,7 +155,7 @@
 					</ul>
 				</div>
 				
-		</div>
+		
 	<div>
 	</div>
 </div>
