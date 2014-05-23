@@ -71,11 +71,124 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 
 }]);
 
-raffleAppControllers.controller('raffleCtrl', function($scope) {
+raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', function($scope,registrationSvc) {
+	var emptyWinner = {};
 
-	
+	$scope.events = registrationSvc.getEvents();
+	$scope.currentEvent = { id: 0};
+	$scope.memberInputDisplay = 1;
+	$scope.eventInputDisplay = false;
+	$scope.currentWinner = emptyWinner;
+	$scope.hasError = true;
+	$scope.errorMessage = 'No entries for this raffle';
 
-});
+	raffleEntries = [];
+
+	createEntries = function() {
+		if($scope.currentEvent.raffleStarted === true) { return; }
+
+		var attendees = $scope.currentEvent.attendees;
+
+		for(var i = 0; i < attendees.length; i++) {
+
+			for(var x = 0; x < attendees[i].entries; x++) {
+				raffleEntries.push(attendees[i]);
+			}
+		}
+
+	}
+
+	$scope.showRaffle = function() { return $scope.currentEvent.id != 0 && $scope.hasError == false; };
+
+	$scope.selectEvent = function(event) {
+		$scope.currentEvent = event;
+		createEntries();
+		$scope.eventInputDisplay = !$scope.eventInputDisplay;
+
+		
+		validateEvent();
+	}
+
+	$scope.drawWinner = function() {
+		validateEvent();
+			$scope.currentEvent.raffleStarted = true;
+			$scope.currentEvent.raffleCompleted = false;
+
+		var rand = raffleEntries[Math.floor(Math.random() * raffleEntries.length)];
+		var winner = {};
+		angular.copy(rand, winner);
+
+		$scope.currentWinner = winner;
+		//$scope.currentEvent.winners.push(winner);
+
+		var position = raffleEntries.indexOf(rand);
+		if ( ~position ) raffleEntries.splice(position, 1);
+
+
+	}
+
+	$scope.setPrize = function(prize) {
+		var winner = {};
+
+		angular.copy($scope.currentWinner, winner);
+		prize.winner  = winner;
+
+		$scope.currentWinner = emptyWinner;
+	}
+
+	$scope.canDraw = function() {
+		
+		if($scope.currentEvent.raffleCompleted) { return false; }
+		if($scope.currentWinner != emptyWinner) { return false; }
+		return !$scope.hasError;
+
+	}
+
+	validateEvent = function() {
+		if(raffleEntries == undefined || (raffleEntries.length == 0 && ($scope.currentEvent.winners == undefined || $scope.currentEvent.winners.length == 0))) {
+			setError('No entries for this raffle');
+			return;
+		}
+
+		if(raffleEntries.length == 0 &&  $scope.currentEvent.winners.length > 0) {
+			$currentEvent.raffleCompleted = true;
+			setError('No more entries for this raffle!');
+			return;
+		}
+
+		if($scope.currentEvent.prizes.length == 0) {
+			setError('No more prizes left!');
+			return;
+		}
+
+		clearError();
+
+	}
+
+	setError = function(message) {
+		$scope.hasError = true;
+		$scope.errorMessage = message;
+	}
+
+	clearError = function() {
+		$scope.errorMessage = '';
+		$scope.hasError = false;
+	}
+
+	$scope.hasWinner = function(result) {
+		return function(prize ) {
+
+			if(prize == undefined) { return false; }
+
+			if(result) {
+				return prize.winner != undefined;
+			} else {
+				return prize.winner == undefined;
+			}
+		}
+	}
+
+}]);
 
 raffleAppControllers.controller('setupCtrl', function($scope) {
 
@@ -96,15 +209,22 @@ raffleAppServices.factory('registrationSvc',
 		function() {
 			return 	{
 					__events: [
-								{ id: 1, date: '5/6/2014', speaker: 'Daniel Lewis', topic: 'Node.JS', location: 'San Bernardino', attendees: [] },
-								{ id: 2, date: '6/10/2014', speaker: 'Dustin Davis', topic: 'SPA with Angular.JS', location: 'San Bernardino', attendees: [] },
-								{ id: 3, date: '7/10/2014', speaker: 'Mike Roth', topic: 'Stuff', location: 'San Bernardino', attendees: [] }
-									],
+								{ id: 1, date: '5/6/2014', speaker: 'Daniel Lewis', topic: 'Node.JS', location: 'San Bernardino', attendees: [], winners:[],
+									prizes: [{ name: 'Telerik Ultimate', sponsor:'Telerik' },{ name: '1 Month Subscription', sponsor:'Pluralsight' }]
+								 },
+								{ id: 2, date: '6/10/2014', speaker: 'Dustin Davis', topic: 'SPA with Angular.JS', location: 'San Bernardino', attendees: [], winners:[],
+									prizes: [{ name: 'Telerik Ultimate', sponsor:'Telerik' },{ name: '1 Month Subscription', sponsor:'Pluralsight' }]
+								 },
+								{ id: 3, date: '7/10/2014', speaker: 'Mike Roth', topic: 'Stuff', location: 'San Bernardino', attendees: [], winners:[],
+									prizes: [{ name: 'Telerik Ultimate', sponsor:'Telerik' },{ name: '1 Month Subscription', sponsor:'Pluralsight' }]
+								 }
+							],
 					__members: [
 						{ id: 1, firstName: 'Dustin', lastName:'Davis', email:'dd@dd.com'},
 						{ id: 2, firstName: 'John', lastName:'Smith', email:'js@dd.com'},
 						{ id: 3, firstName: 'Mary', lastName:'Smith', email:'ms@dd.com'}
 					],
+
 					getEvents: function() {
 								return	this.__events;
 					},

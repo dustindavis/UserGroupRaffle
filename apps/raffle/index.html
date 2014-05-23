@@ -4,15 +4,77 @@
 <div class="container">
 
 	<div class="row">
-		<div class="col-md-3">
-			<h4>&nbsp;</h4>
+		<div class="col-md-3" ></div>
+
+		<div class="col-md-9" ng-show="hasError">
+
+	    	<h3>{{errorMessage}}</h3>
 		</div>
-		<div class="col-md-9" ng-show="showAttendeeList()">
+
+		<div class="col-md-9" ng-show="showRaffle()">
+
+	    	<label class="btn btn-xl btn-success" ng-model="eventInputDisplay" ng-click="drawWinner()" ng-show="canDraw()">Draw Ticket!</label>
+	    	<span ng-hide="canDraw()">
+	    		<label>Congratulations, {{currentWinner.firstName}} {{currentWinner.lastName}}, select a prize!</label>
+	    	</span>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-3">
+			<h4>Event: {{currentEvent.topic}}</h4>
+		</div>
+		<div class="col-md-9" ng-show="showRaffle()">
 				<div class="attendees col-md-4" >
-					<h4>Event: {{currentEvent.topic}}</h4>
+					<h4>Winners</h4>
 				</div>
 				<div class="attendees col-md-5" >
-					<h4>Attendees</h4>
+					<h4>Remaining Prizes</h4>
 				</div>
 		</div>
 	</div>
+
+	<div class="row">
+
+
+		<div class="col-md-3">
+			<div class="btn-group">
+		        <label class="btn btn-sm btn-default" ng-model="eventInputDisplay" ng-click="eventInputDisplay = !eventInputDisplay">Change Event</label>
+		    </div>
+
+			
+
+			<ul class="list-group storedMeetings" ng-hide="eventInputDisplay">
+				<li class="list-group-item dropdown" ng-repeat="event in events" ng-click="selectEvent(event)">{{event.topic}}<br />{{event.date}} - {{event.speaker}}</li>
+			</ul>
+
+
+
+		</div>
+
+		
+		<div ng-show="showRaffle()" class="attendees col-md-9">
+			
+
+				<div class="attendees col-md-4" >
+										
+					<ul class="list-group members">
+						<li class="list-group-item" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(true))"> {{prize.winner.firstName}} {{prize.winner.firstName}} <br/> {{prize.name}} 
+							
+						</li>
+					</ul>
+					
+				</div>
+				<div class="attendees col-md-5">
+					<ul class="list-group members">
+						<li class="list-group-item" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(false))" ng-click="setPrize(prize)"> {{prize.name}} <br/> {{prize.sponsor}} 
+							<span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
+						</li>
+					</ul>
+					
+				</div>
+				
+		
+		</div>
+	</div>
+</div>
