@@ -4,19 +4,26 @@ var raffleAppControllers = angular.module('raffleAppControllers', []);
 
 raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc', function($scope,registrationSvc) {
 
-	$scope.members = registrationSvc.getMembers();
-	$scope.events = registrationSvc.getEvents();
-	$scope.currentEvent = { id: 0};
+	$scope.members = [];
+	$scope.events = [];
+	
+	registrationSvc.getMembers().then(function(members) { $scope.members = members;  });
+	registrationSvc.getEvents().then(function(events) {  $scope.events = events;  });
+
+	$scope.currentEvent = { id: 0 };
 	$scope.memberInputDisplay = 1;
 	$scope.eventInputDisplay = 1;
+
 
 	$scope.showAttendeeList = function() { return $scope.currentEvent.id != 0; };
 
 	$scope.createEvent = function(newEvent) {
-		registrationSvc.addEvent(newEvent);
-		$scope.events = registrationSvc.getEvents();
-		$scope.currentEvent = newEvent;
-		$scope.newEvent = {};
+		registrationSvc.addEvent(newEvent).then(function(events) {
+			$scope.events = events;
+			$scope.currentEvent = newEvent;
+			$scope.newEvent = {};
+		});
+		
 	}
 
 	$scope.selectEvent = function(event) {
@@ -29,9 +36,12 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 
 	$scope.createAttendee = function(newAttendee) {
 		addAttendeeToEvent(newAttendee);
-		registrationSvc.createMember(newAttendee);
-		$scope.members = registrationSvc.getMembers();
-		$scope.newAttendee = {};
+
+		registrationSvc.createMember(newAttendee).then(function(members) {
+			$scope.members = members;
+			$scope.newAttendee = {};
+		});
+		
 	}
 
 	$scope.adjustEntries = function(attendee, value) {
@@ -74,8 +84,9 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', function($scope,registrationSvc) {
 	var emptyWinner = {};
 
-	$scope.events = registrationSvc.getEvents();
-	$scope.currentEvent = { id: 0};
+	registrationSvc.getEvents().then(function(events) { $scope.events = events; });
+
+	$scope.currentEvent = { id: 0 };
 	$scope.memberInputDisplay = 1;
 	$scope.eventInputDisplay = false;
 	$scope.currentWinner = emptyWinner;
@@ -119,7 +130,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		angular.copy(rand, winner);
 
 		$scope.currentWinner = winner;
-		//$scope.currentEvent.winners.push(winner);
+		$scope.currentEvent.winners.push(winner);
 
 		var position = raffleEntries.indexOf(rand);
 		if ( ~position ) raffleEntries.splice(position, 1);
@@ -134,6 +145,8 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		prize.winner  = winner;
 
 		$scope.currentWinner = emptyWinner;
+
+
 	}
 
 	$scope.canDraw = function() {
@@ -206,9 +219,9 @@ raffleAppControllers.controller('reportsCtrl', function($scope) {
 var raffleAppServices = angular.module('raffleAppServices', []);
 
 raffleAppServices.factory('registrationSvc', 
-		function() {
+		function($q,$timeout) {
 			return 	{
-					__events: [
+					__events: [ 
 								{ id: 1, date: '5/6/2014', speaker: 'Daniel Lewis', topic: 'Node.JS', location: 'San Bernardino', attendees: [], winners:[],
 									prizes: [{ name: 'Telerik Ultimate', sponsor:'Telerik' },{ name: '1 Month Subscription', sponsor:'Pluralsight' }]
 								 },
@@ -226,16 +239,48 @@ raffleAppServices.factory('registrationSvc',
 					],
 
 					getEvents: function() {
-								return	this.__events;
+						var deferred = $q.defer();	
+						var self = this;
+
+						setTimeout(function() {
+							deferred.resolve(self.__events);
+						}, 500);
+
+						return	deferred.promise;
 					},
 					addEvent: function(newEvent) {
-						this.__events.push(newEvent);
+						var deferred = $q.defer();	
+						var self = this;
+						
+						setTimeout(function() {
+							self.__events.push(newEvent);
+							deferred.resolve(self.__events);
+						}, 500);
+
+						return	deferred.promise;
+
 					},
 					getMembers: function() {
-						return this.__members;
+						var deferred = $q.defer();	
+						var self = this;
+
+						setTimeout(function() {
+							deferred.resolve(self.__members);
+						}, 500);
+
+						return	deferred.promise;
 					},
 					createMember: function(member) {
-						this.__members.push(member);
+						var deferred = $q.defer();	
+						var self = this;
+
+						setTimeout(function() {
+							self.__members.push(member);
+							deferred.resolve(self.__members);
+						}, 500);
+
+						return	deferred.promise;
+						
 					}
 
 				};
