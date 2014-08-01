@@ -36,7 +36,7 @@
 				<fieldset>
 
 				<div class="control-group">
-				  <label class="control-label" for="txtfn">Meeting Data</label>
+				  <label class="control-label" for="txtfn">Meeting Date</label>
 				  <div class="controls">
 				   <input type="text" placeholder="Meeting Date" value="" ng-model="newEvent.date" />
 				    
@@ -129,14 +129,18 @@
 						</fieldset>
 					</form>
 
+					<div ng-show="memberInputDisplay == '1'">
 
-					<ul class="list-group members" ng-show="memberInputDisplay == '1'">
-						<li class="list-group-item" ng-repeat="member in (members | filter:isAttending(currentEvent.attendees))"> {{member.lastName}}, {{member.firstName}} 
-							<span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
-						</li>
-					</ul>
+						<span ng-show="(members|filter:isAttending(currentEvent.attendees)).length == 0">No more members</span>
+						<ul class="list-group members">
+							<li class="list-group-item" ng-repeat="member in (members | filter:isAttending(currentEvent.attendees))"> {{member.lastName}}, {{member.firstName}} 
+								<span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
+							</li>
+						</ul>
+					</div>
 				</div>
 				<div class="attendees col-md-5">
+						<span ng-show="currentEvent.attendees.length == 0">No attendees</span>
 
 					<ul class="list-group attending">
 						<li class="list-group-item" ng-repeat="attendee in currentEvent.attendees">
