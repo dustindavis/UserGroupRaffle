@@ -170,6 +170,8 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 
 		registrationSvc.updateEvent($scope.currentEvent);
 
+		validateEvent();
+
 	}
 
 	$scope.canDraw = function() {
@@ -192,6 +194,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		}
 
 		if($scope.currentEvent.prizes.length == 0) {
+			$scope.currentEvent.raffleCompleted = true;
 			setError('No more prizes left!');
 			return;
 		}

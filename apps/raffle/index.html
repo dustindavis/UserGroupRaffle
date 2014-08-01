@@ -1,3 +1,10 @@
+<style>
+	.raffleControl {
+		height: 120px;
+		border-bottom: solid 1px black;
+	}
+</style>
+
 
 <h2 >Raffle</h2>
 
@@ -6,13 +13,16 @@
 	<div class="row">
 		<div class="col-md-3" ></div>
 
-		<div class="col-md-9" ng-show="hasError">
+		<div class="col-md-9" ng-show="currentEvent.raffleCompleted">
+	    		<h3>This raffle has ended</h3>
+			</div>
 
-	    	<h3>{{errorMessage}}</h3>
-		</div>
+		<div class="col-md-9 raffleControl" ng-show="showRaffle()">
+			<div class="col-md-9" ng-show="hasError">
+	    		<h3>{{errorMessage}}</h3>
+			</div>
 
-		<div class="col-md-9" ng-show="showRaffle()">
-
+			<h3>Event: {{currentEvent.topic}}</h3>
 	    	<label class="btn btn-xl btn-success" ng-model="eventInputDisplay" ng-click="drawWinner()" ng-show="canDraw()">Draw Ticket!</label>
 	    	<span ng-hide="canDraw()">
 	    		<label>Congratulations, {{currentWinner.firstName}} {{currentWinner.lastName}}, select a prize!</label>
@@ -22,7 +32,7 @@
 
 	<div class="row">
 		<div class="col-md-3">
-			<h4>Event: {{currentEvent.topic}}</h4>
+			<h4>Event Selection</h4>
 		</div>
 		<div class="col-md-9" ng-show="showRaffle()">
 				<div class="attendees col-md-4" >
@@ -52,6 +62,7 @@
 		<div class="attendees col-md-9">
 
 				<div class="attendees col-md-4" >
+						<span ng-show="currentEvent.winners.length == 0">No winners yet</span>
 					
 					<ul class="list-group members">
 						<li class="list-group-item" ng-repeat="winner in currentEvent.winners"> {{winner.firstName}} {{winner.lastName}} <br/> {{winner.prize.name}} 
@@ -61,6 +72,8 @@
 					
 				</div>
 				<div class="attendees col-md-5">
+						<span ng-show="(currentEvent.prizes | filter:hasWinner(false)).length == 0">No more prizes</span>
+
 					<ul class="list-group members">
 						<li class="list-group-item" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(false))" ng-click="setPrize(prize)"> {{prize.name}} <br/> {{prize.sponsor}} 
 							<span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
