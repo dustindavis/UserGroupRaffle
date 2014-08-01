@@ -1,7 +1,7 @@
 
 //SETUP
-var __MONGODB_USER 		= "";
-var __MONGODB_API_KEY 	= "";
+var __MONGODB_USER 		= "ugraffleapp";
+var __MONGODB_API_KEY 	= "xJgTUGLkO2VW_N3JGbJBTnsWUOJyfdGs";
 
 //CONTORLLERS
 var raffleAppControllers = angular.module('raffleAppControllers', []);
