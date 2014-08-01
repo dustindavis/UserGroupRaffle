@@ -1,4 +1,8 @@
 
+//SETUP
+var __MONGODB_USER 		= "ugraffleapp";
+var __MONGODB_API_KEY 	= "xJgTUGLkO2VW_N3JGbJBTnsWUOJyfdGs";
+
 //CONTORLLERS
 var raffleAppControllers = angular.module('raffleAppControllers', []);
 
@@ -49,6 +53,7 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 		attendee.entries += value;
 
 		if(attendee.entries < 0) { attendee.entries = 0; }
+		registrationSvc.updateEvent($scope.currentEvent);
 
 	}
 
@@ -56,12 +61,16 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 		var position = $scope.currentEvent.attendees.indexOf(attendee);
 
 		if ( ~position ) $scope.currentEvent.attendees.splice(position, 1);
+		registrationSvc.updateEvent($scope.currentEvent);
+
 	}
 
 	function addAttendeeToEvent(attendee) {
 		if($scope.currentEvent.attendees == undefined) { $scope.currentEvent.attendees = []; }
 		attendee.entries = 2;
 		$scope.currentEvent.attendees.push(attendee);
+		registrationSvc.updateEvent($scope.currentEvent);
+
 	}
 
 	$scope.isAttending = function(attendees) {
@@ -70,7 +79,7 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 			if(attendees == undefined) { return true; }
 
 			for(var i =0;i<attendees.length;i++) {
-				if(attendees[i].email == member.email) {
+				if(attendees[i].id == member.id) {
 					return false;
 				}
 			}
@@ -81,9 +90,12 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
 
 }]);
 
+//**************************[ Raffle Controller ]**************************//
 raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', function($scope,registrationSvc) {
 	var emptyWinner = {};
+	var __prizeList = [];
 
+	registrationSvc.getPrizes().then(function(prizes) { __prizeList = prizes; });
 	registrationSvc.getEvents().then(function(events) { $scope.events = events; });
 
 	$scope.currentEvent = { id: 0 };
@@ -106,22 +118,30 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 				raffleEntries.push(attendees[i]);
 			}
 		}
-
 	}
 
 	$scope.showRaffle = function() { return $scope.currentEvent.id != 0 && $scope.hasError == false; };
 
 	$scope.selectEvent = function(event) {
+		if(event.prizes === undefined) {
+			event.prizes = __prizeList;
+		}
+
+		if(event.winners === undefined){
+			event.winners = [];
+		}
+
 		$scope.currentEvent = event;
+
 		createEntries();
 		$scope.eventInputDisplay = !$scope.eventInputDisplay;
-
 		
 		validateEvent();
 	}
 
 	$scope.drawWinner = function() {
 		validateEvent();
+
 			$scope.currentEvent.raffleStarted = true;
 			$scope.currentEvent.raffleCompleted = false;
 
@@ -130,11 +150,9 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		angular.copy(rand, winner);
 
 		$scope.currentWinner = winner;
-		$scope.currentEvent.winners.push(winner);
 
 		var position = raffleEntries.indexOf(rand);
 		if ( ~position ) raffleEntries.splice(position, 1);
-
 
 	}
 
@@ -142,10 +160,15 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		var winner = {};
 
 		angular.copy($scope.currentWinner, winner);
-		prize.winner  = winner;
+		winner.prize  = prize;
+		$scope.currentEvent.winners.push(winner);
 
 		$scope.currentWinner = emptyWinner;
 
+		var position = $scope.currentEvent.prizes.indexOf(prize);
+		if ( ~position ) $scope.currentEvent.prizes.splice(position, 1);
+
+		registrationSvc.updateEvent($scope.currentEvent);
 
 	}
 
@@ -154,7 +177,6 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		if($scope.currentEvent.raffleCompleted) { return false; }
 		if($scope.currentWinner != emptyWinner) { return false; }
 		return !$scope.hasError;
-
 	}
 
 	validateEvent = function() {
@@ -164,8 +186,8 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		}
 
 		if(raffleEntries.length == 0 &&  $scope.currentEvent.winners.length > 0) {
-			$currentEvent.raffleCompleted = true;
-			setError('No more entries for this raffle!');
+			$scope.currentEvent.raffleCompleted = true;
+			setError('This raffle has ended!');
 			return;
 		}
 
@@ -175,7 +197,6 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 		}
 
 		clearError();
-
 	}
 
 	setError = function(message) {
@@ -189,7 +210,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc', func
 	}
 
 	$scope.hasWinner = function(result) {
-		return function(prize ) {
+		return function(prize) {
 
 			if(prize == undefined) { return false; }
 
@@ -219,9 +240,9 @@ raffleAppControllers.controller('reportsCtrl', function($scope) {
 var raffleAppServices = angular.module('raffleAppServices', []);
 
 raffleAppServices.factory('registrationSvc', 
-		function($q,$timeout) {
+		function($http,$q,$timeout) {
 			return 	{
-					__events: [ 
+					__events: [ /*
 								{ id: 1, date: '5/6/2014', speaker: 'Daniel Lewis', topic: 'Node.JS', location: 'San Bernardino', attendees: [], winners:[],
 									prizes: [{ name: 'Telerik Ultimate', sponsor:'Telerik' },{ name: '1 Month Subscription', sponsor:'Pluralsight' }]
 								 },
@@ -231,42 +252,60 @@ raffleAppServices.factory('registrationSvc',
 								{ id: 3, date: '7/10/2014', speaker: 'Mike Roth', topic: 'Stuff', location: 'San Bernardino', attendees: [], winners:[],
 									prizes: [{ name: 'Telerik Ultimate', sponsor:'Telerik' },{ name: '1 Month Subscription', sponsor:'Pluralsight' }]
 								 }
-							],
-					__members: [
-						{ id: 1, firstName: 'Dustin', lastName:'Davis', email:'dd@dd.com'},
-						{ id: 2, firstName: 'John', lastName:'Smith', email:'js@dd.com'},
-						{ id: 3, firstName: 'Mary', lastName:'Smith', email:'ms@dd.com'}
-					],
+							*/],
+					__members: [],
+					__prizes: [],
 
 					getEvents: function() {
 						var deferred = $q.defer();	
 						var self = this;
 
-						setTimeout(function() {
-							deferred.resolve(self.__events);
-						}, 500);
+						$http.get(MongoDB('events'))
+							.then(function(data) {
+								self.__events = data.data;
+								deferred.resolve(self.__events);
+							});
 
 						return	deferred.promise;
 					},
 					addEvent: function(newEvent) {
 						var deferred = $q.defer();	
 						var self = this;
-						
-						setTimeout(function() {
-							self.__events.push(newEvent);
-							deferred.resolve(self.__events);
-						}, 500);
+
+						newEvent.id = Guid();
+						self.__events.push(newEvent);
+
+						$http.post(MongoDB('events'), newEvent)
+							.then(function(data) {
+								deferred.resolve(self.__events);
+							});
 
 						return	deferred.promise;
-
 					},
+					updateEvent: function(event) {
+						var deferred = $q.defer();	
+						var self = this;
+
+						var id = '{"id":"' + event.id + '"}';
+						delete event._id;
+
+						$http.put(MongoDB('events') + '&q=' + id,event)
+							.then(function(data) {
+								deferred.resolve(self.__events);
+							});
+
+						return	deferred.promise;
+					},
+
 					getMembers: function() {
 						var deferred = $q.defer();	
 						var self = this;
 
-						setTimeout(function() {
-							deferred.resolve(self.__members);
-						}, 500);
+						$http.get(MongoDB('members'))
+							.then(function(data) {
+								self.__members = data.data;
+								deferred.resolve(self.__members);
+							});
 
 						return	deferred.promise;
 					},
@@ -274,20 +313,48 @@ raffleAppServices.factory('registrationSvc',
 						var deferred = $q.defer();	
 						var self = this;
 
-						setTimeout(function() {
-							self.__members.push(member);
-							deferred.resolve(self.__members);
-						}, 500);
+						member.id = Guid();
+						
+						self.__members.push(member);
+
+						$http.post(MongoDB('members'), member)
+							.then(function(data) {
+								deferred.resolve(self.__members);
+							});
 
 						return	deferred.promise;
-						
+					},
+
+					getPrizes: function() {
+						var deferred = $q.defer();	
+						var self = this;
+
+						$http.get(MongoDB('prizes'))
+							.then(function(data) {
+								self.__prizes = data.data;
+								deferred.resolve(self.__prizes);
+							});
+
+						return	deferred.promise;
+					},
+					createPrize: function(prize) {
+						var deferred = $q.defer();	
+						var self = this;
+						prize.id = Guid();
+						self.__members.push(prize);
+
+						$http.post(MongoDB('prizes'), prize)
+							.then(function(data) {
+								deferred.resolve(self.__prizes);
+							});
+
+						return	deferred.promise;
 					}
 
 				};
 		}
 
 	);
-
 
 
 var raffleApp = angular.module('ugRaffleApp', ['ngRoute', 'raffleAppControllers','raffleAppServices']);
@@ -305,11 +372,25 @@ raffleApp.config(['$routeProvider',
 			.when('/setup', { templateUrl: 'apps/setup/index.html', controller: 'setupCtrl'})
 			.when('/reports', { templateUrl: 'apps/reports/index.html', controller: 'reportsCtrl'})
 			.otherwise({redirectTo:'/registration'});
-
 	}]
-
 );
 
+var MongoDB = function(db) {
+	var url = 'https://api.mongolab.com/api/1/databases/' + __MONGODB_USER + '/collections/' + db + '?apiKey=' + __MONGODB_API_KEY;
+
+	return url;
+}
+
+var Guid = (function() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+               .toString(16)
+               .substring(1);
+  }
+  return function() {
+    return s4() + s4() + s4() + s4() + s4() + s4() + s4() + s4();
+  };
+})();
 
 
 

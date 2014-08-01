@@ -42,24 +42,19 @@
 		        <label class="btn btn-sm btn-default" ng-model="eventInputDisplay" ng-click="eventInputDisplay = !eventInputDisplay">Change Event</label>
 		    </div>
 
-			
-
 			<ul class="list-group storedMeetings" ng-hide="eventInputDisplay">
 				<li class="list-group-item dropdown" ng-repeat="event in events" ng-click="selectEvent(event)">{{event.topic}}<br />{{event.date}} - {{event.speaker}}</li>
 			</ul>
 
-
-
 		</div>
 
 		
-		<div ng-show="showRaffle()" class="attendees col-md-9">
-			
+		<div class="attendees col-md-9">
 
 				<div class="attendees col-md-4" >
-										
+					
 					<ul class="list-group members">
-						<li class="list-group-item" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(true))"> {{prize.winner.firstName}} {{prize.winner.firstName}} <br/> {{prize.name}} 
+						<li class="list-group-item" ng-repeat="winner in currentEvent.winners"> {{winner.firstName}} {{winner.lastName}} <br/> {{winner.prize.name}} 
 							
 						</li>
 					</ul>
@@ -73,7 +68,6 @@
 					</ul>
 					
 				</div>
-				
 		
 		</div>
 	</div>
