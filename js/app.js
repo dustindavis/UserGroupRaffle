@@ -1,6 +1,6 @@
 //SETUP
-var __MONGODB_USER 		= "ugraffleapp";
-var __MONGODB_API_KEY 	= "xJgTUGLkO2VW_N3JGbJBTnsWUOJyfdGs";
+var __MONGODB_USER 		= "";
+var __MONGODB_API_KEY 	= "";
 
 
 //CONTORLLERS
@@ -138,7 +138,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
 
             var attendees = $scope.currentEvent.attendees;
             var tmpEntries = [];
-            
+
             for (var i = 0; i < attendees.length; i++) {
 
                 for (var x = 0; x < attendees[i].entries; x++) {
