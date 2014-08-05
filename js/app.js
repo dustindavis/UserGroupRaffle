@@ -186,6 +186,10 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
         $scope.setPrize = function (prize) {
             var winner = {};
 
+            if ($scope.currentWinner === emptyWinner) {
+                return;
+            }
+
             angular.copy($scope.currentWinner, winner);
             winner.prize = prize;
             $scope.currentEvent.winners.push(winner);
@@ -204,7 +208,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
             if ($scope.currentEvent.raffleCompleted) {
                 return false;
             }
-            if ($scope.currentWinner != emptyWinner) {
+            if ($scope.currentWinner !== emptyWinner) {
                 return false;
             }
             return !$scope.hasError;
