@@ -17,7 +17,7 @@
                 </div>
 
                 <ul class="nav nav-pills nav-stacked storedMeetings" ng-show="eventInputDisplay == 1">
-                    <li ng-repeat="event in events" ng-click="selectEvent(event)" ng-class="{$first ? 'active' : ''}">
+                    <li ng-repeat="event in events" ng-click="selectEvent(event)" ng-class="{{$first ? 'active' : ''}}">
                         <a data-toggle="tab">{{event.topic}} <br />{{event.date}} - {{event.speaker}}
                         </a>
                     </li>

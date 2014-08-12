@@ -20,7 +20,7 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
         });
 
         $scope.currentEvent = {
-            id: 0
+            id: 0, topic: 'None'
         };
         $scope.memberInputDisplay = 1;
         $scope.eventInputDisplay = 1;
@@ -79,6 +79,7 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
         }
 
         function addAttendeeToEvent(attendee) {
+            if($scope.currentEvent == undefined || $scope.currentEvent.id == "0") { return; }
             if ($scope.currentEvent.attendees == undefined) {
                 $scope.currentEvent.attendees = [];
             }
