@@ -1,6 +1,6 @@
 //SETUP
-var __MONGODB_USER 		= "";
-var __MONGODB_API_KEY 	= "";
+var __MONGODB_USER = "";
+var __MONGODB_API_KEY = "";
 
 
 //CONTORLLERS
@@ -289,12 +289,6 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
 
 }]);
 
-raffleAppControllers.controller('setupCtrl', function ($scope) {
-
-
-
-});
-
 raffleAppControllers.controller('reportsCtrl', function ($scope) {
 
 
@@ -431,7 +425,7 @@ raffleApp.config(['$routeProvider',
                 controller: 'raffleCtrl'
             })
             .when('/setup', {
-                templateUrl: 'apps/setup/index.html',
+                templateUrl: 'apps/setup/setup.html',
                 controller: 'setupCtrl'
             })
             .when('/reports', {

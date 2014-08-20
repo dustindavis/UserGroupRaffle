@@ -1,0 +1,30 @@
+﻿<div class="panel panel-default" ng-controller="SetupEventsCtrl">
+    <div class="panel-heading">
+        <h3 class="panel-title">Manage Events</h3>
+    </div>
+    <div class="panel-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Event Topic</th>
+                        <th>Speaker</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="event in events">
+                        <td>{{event.date}}</td>
+                        <td>{{event.topic}}</td>
+                        <td>{{event.speaker}}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+                            <button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

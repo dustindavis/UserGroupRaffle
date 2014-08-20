@@ -1,16 +1,16 @@
 <div class="row">
     <!--
-        <div class="col-md-9" ng-show="hasError">
-            <h3>{{errorMessage}}</h3>
-        </div>
--->
+            <div class="col-md-9" ng-show="hasError">
+                <h3>{{errorMessage}}</h3>
+            </div>
+    -->
     <div class="col-md-3">
         <h2>Raffle</h2>
     </div>
     <div class="col-md-9" ng-show="showRaffle()">
         <span ng-hide="canDraw()">
-	    		<label>Congratulations, {{currentWinner.firstName}} {{currentWinner.lastName}}, select a prize!</label>
-	    	</span>
+            <label>Congratulations, {{currentWinner.firstName}} {{currentWinner.lastName}}, select a prize!</label>
+        </span>
     </div>
 </div>
 
@@ -23,15 +23,15 @@
         <label class="btn btn-xl btn-success" ng-model="eventInputDisplay" ng-click="drawWinner()" ng-show="canDraw()">Draw Ticket!</label>
     </div>
     <!--
-        <div class="col-md-9" ng-show="showRaffle()">
-            <div class="attendees col-md-4">
-                <h4>Winners</h4>
+            <div class="col-md-9" ng-show="showRaffle()">
+                <div class="attendees col-md-4">
+                    <h4>Winners</h4>
+                </div>
+                <div class="attendees col-md-5">
+                    <h4>Remaining Prizes</h4>
+                </div>
             </div>
-            <div class="attendees col-md-5">
-                <h4>Remaining Prizes</h4>
-            </div>
-        </div>
--->
+    -->
 </div>
 
 <div class="row">
@@ -43,8 +43,10 @@
         </div>
 
         <ul class="list-group storedMeetings" ng-hide="eventInputDisplay">
-            <li class="list-group-item dropdown" ng-repeat="event in events" ng-click="selectEvent(event)">{{event.topic}}
-                <br />{{event.date}} - {{event.speaker}}</li>
+            <li class="list-group-item dropdown" ng-repeat="event in events" ng-click="selectEvent(event)">
+                {{event.topic}}
+                <br />{{event.date}} - {{event.speaker}}
+            </li>
         </ul>
 
     </div>
@@ -60,8 +62,9 @@
                     </div>
                     <div class="panel-body">
                         <ul class="list-group members">
-                            <li class="list-group-item" ng-repeat="winner in currentEvent.winners">{{winner.firstName}} {{winner.lastName}}
-                                <br/>{{winner.prize.name}}
+                            <li class="list-group-item" ng-repeat="winner in currentEvent.winners">
+                                {{winner.firstName}} {{winner.lastName}}
+                                <br />{{winner.prize.name}}
 
                             </li>
                         </ul>
@@ -69,7 +72,6 @@
                 </div>
             </div>
             <!-- Winners - End -->
-
             <!-- Prizes - Begin -->
             <div class="col-md-6">
                 <div class="panel panel-primary">
@@ -78,8 +80,9 @@
                     </div>
                     <div class="panel-body">
                         <ul class="list-group members">
-                            <li class="list-group-item" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(false))" ng-click="setPrize(prize)">{{prize.name}}
-                                <br/>{{prize.sponsor}}
+                            <li class="list-group-item" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(false))" ng-click="setPrize(prize)">
+                                {{prize.name}}
+                                <br />{{prize.sponsor}}
                                 <span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
                             </li>
                         </ul>

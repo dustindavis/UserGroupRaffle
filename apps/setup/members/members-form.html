@@ -1,0 +1,38 @@
+﻿
+<form class="form-horizontal">
+    <fieldset>
+
+        <div class="control-group">
+            <label class="control-label" for="txtfn">First Name</label>
+            <div class="controls">
+                <input id="txtfn" name="txtfn" type="text" placeholder="First Name" class="input-small" ng-model="newMember.firstName">
+
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="txtln">Last Name</label>
+            <div class="controls">
+                <input id="txtln" name="txtln" type="text" placeholder="Last Name" class="input-small" ng-model="newMember.lastName">
+
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="txtem">Email</label>
+            <div class="controls">
+                <input id="txtem" name="txtem" type="text" placeholder="Email Address" class="input-medium" ng-model="newMember.email">
+
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label" for="btnSave"></label>
+            <div class="controls">
+                <button id="btnSave" name="btnSave" class="btn btn-sm btn-success" ng-click="createMember(newMember)">Add</button>
+                <button id="btnClear" name="btnClear" class="btn btn-sm btn-warning" ng-click="newMember = {}">Clear</button>
+            </div>
+        </div>
+
+    </fieldset>
+</form>
