@@ -1,8 +1,35 @@
-﻿<div class="panel panel-default">
+﻿<div class="panel panel-default" ng-controller="SetupPrizesCtrl">
     <div class="panel-heading">
         <h3 class="panel-title">Manage Prizes</h3>
     </div>
     <div class="panel-body">
-        Panel content
+        <div class="col-md-1 col-md-offset-11">
+            <button type="button" class="btn btn-success btn-sm" ng-click="addPrize()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Value</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="prize in prizes">
+                        <td>{{prize.name}}</td>
+                        <td>{{prize.description}}</td>
+                        <td>{{prize.value}}</td>
+                        <td>
+                            <div class="btn-group-vertical">
+                                <button type="button" class="btn btn-primary btn-sm" ng-click="editPrize(prizes[$index])"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+                                <button type="button" class="btn btn-danger btn-sm" ng-click="deletePrize(prizes[$index])"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

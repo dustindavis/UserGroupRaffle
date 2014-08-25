@@ -20,7 +20,8 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
         });
 
         $scope.currentEvent = {
-            id: 0, topic: 'None'
+            id: 0,
+            topic: 'None'
         };
         $scope.memberInputDisplay = 1;
         $scope.eventInputDisplay = 1;
@@ -79,7 +80,9 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
         }
 
         function addAttendeeToEvent(attendee) {
-            if($scope.currentEvent == undefined || $scope.currentEvent.id == "0") { return; }
+            if ($scope.currentEvent == undefined || $scope.currentEvent.id == "0") {
+                return;
+            }
             if ($scope.currentEvent.attendees == undefined) {
                 $scope.currentEvent.attendees = [];
             }
@@ -146,27 +149,26 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
                     tmpEntries.push(attendees[i]);
                 }
             }
-            
+
             raffleEntries = shuffle(tmpEntries);
 
         }
 
-        var shuffle = function(array) {
-          var currentIndex = array.length
-            , temporaryValue
-            , randomIndex ;
+        var shuffle = function (array) {
+            var currentIndex = array.length,
+                temporaryValue, randomIndex;
 
-          while (0 !== currentIndex) {
+            while (0 !== currentIndex) {
 
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
 
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-          }
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
 
-          return array;
+            return array;
         }
 
         $scope.showRaffle = function () {
@@ -225,7 +227,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
 
 
             registrationSvc.updateEvent($scope.currentEvent);
-		  validateEvent();
+            validateEvent();
 
 
         }
@@ -406,7 +408,7 @@ raffleAppServices.factory('registrationSvc',
 );
 
 
-var raffleApp = angular.module('ugRaffleApp', ['ngRoute', 'raffleAppControllers', 'raffleAppServices']);
+var raffleApp = angular.module('ugRaffleApp', ['ngRoute', 'raffleAppControllers', 'raffleAppServices', 'ui.bootstrap']);
 
 //FILTERS
 

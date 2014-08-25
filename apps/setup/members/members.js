@@ -1,23 +1,112 @@
-﻿angular.module('ugRaffleApp').controller("SetupMembersCtrl", ['$scope', 'memberService',
-    function ($scope, memberService) {
+﻿angular.module('ugRaffleApp')
+    .controller("SetupMembersCtrl", ['$scope', '$modal', 'MemberService',
+    function ($scope, $modal, MemberService) {
 
         $scope.members = [];
 
-        memberService.getMembers().then(function (members) {
-            $scope.members = members;
-        });
+        loadRemoteData();
 
-        $scope.addMember = function (newMember) {
-            memberService.createMember(newMember).then(function (members) {
+        $scope.createMember = function (newMember) {
+            MemberService.addMember(newMember).then(function (members) {
                 $scope.members = members;
                 $scope.newMember = {};
             });
         };
 
+        $scope.deleteMember = function (member) {
+            MemberService.deleteMember(member)
+                .then(loadRemoteData);
+        };
+
+        $scope.editMember = function (member) {
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/modal.html',
+                controller: 'MemberModalInstanceCtrl',
+                size: 'lg',
+                resolve: {
+                    modalInformation: function () {
+                        var info = {};
+
+                        info = {
+                            member: member,
+                            modalTitle: 'Edit Member',
+                            modalDocument: 'apps/setup/members/members-edit.html'
+                        };
+
+                        return info;
+                    }
+                }
+            });
+
+            modalInstance.result
+                .then(function (member) {
+                    $scope.updateMember(member);
+                });
+        };
+
+        $scope.addMember = function () {
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/modal.html',
+                controller: 'MemberModalInstanceCtrl',
+                size: 'lg',
+                resolve: {
+                    modalInformation: function () {
+                        var info = {};
+
+                        info = {
+                            member: {},
+                            modalTitle: 'Add Member',
+                            modalDocument: 'apps/setup/members/members-add.html'
+                        };
+
+                        return info;
+                    }
+                }
+            });
+
+            modalInstance.result
+                .then(function (member) {
+                    $scope.createMember(member);
+                })
+                .then(loadRemoteData);
+        };
+
+        $scope.updateMember = function (member) {
+            MemberService.updateMember(member)
+                .then(loadRemoteData);
+        };
+
+        function loadRemoteData() {
+            MemberService.getMembers()
+                .then(function (members) {
+                    setRemoteData(members);
+                });
+        };
+
+        function setRemoteData(members) {
+            $scope.members = members;
+        };
+
     }]);
 
+angular.module('ugRaffleApp')
+.controller('MemberModalInstanceCtrl', ['$scope', '$modalInstance', 'modalInformation',
+    function ($scope, $modalInstance, modalInformation) {
+        $scope.member = modalInformation['member'];
+        $scope.modalTitle = modalInformation['modalTitle'];
+        $scope.modalDocument = modalInformation['modalDocument'];
 
-angular.module('raffleAppServices').factory('memberService', 
+        $scope.updateMember = function () {
+            $modalInstance.close($scope.member);
+        };
+
+        $scope.createMember = function () {
+            $modalInstance.close($scope.member);
+        };
+
+    }]);
+
+angular.module('raffleAppServices').factory('MemberService',
     function ($http, $q, $timeout) {
 
         var members = new Array(),
@@ -41,7 +130,7 @@ angular.module('raffleAppServices').factory('memberService',
 
                 member.id = Guid();
 
-                self._members.push(member);
+                self.members.push(member);
 
                 $http.post(MongoDB('members'), member)
                     .then(function (data) {
@@ -49,11 +138,41 @@ angular.module('raffleAppServices').factory('memberService',
                     });
 
                 return deferred.promise;
+            },
+
+            updateMember = function (member) {
+                var deferred = $q.defer();
+                var self = this;
+
+                var id = '{"id":"' + member.id + '"}';
+                delete member._id;
+
+                $http.put(MongoDB('members') + '&q=' + id, member)
+                    .then(function (data) {
+                        deferred.resolve(self.members);
+                    });
+
+                return deferred.promise;
+            },
+
+            deleteMember = function (member) {
+                var deferred = $q.defer();
+                var self = this;
+                var collectionWithId = 'members/' + member._id.$oid;
+
+                $http.delete(MongoDB(collectionWithId))
+                        .then(function (data) {
+                            deferred.resolve(self.members);
+                        });
+
+                return deferred.promise;
             };
 
         return {
             members: members,
             getMembers: getMembers,
-            addMember: addMember
+            addMember: addMember,
+            updateMember: updateMember,
+            deleteMember: deleteMember
         }
     });

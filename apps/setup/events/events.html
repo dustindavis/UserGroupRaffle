@@ -3,6 +3,9 @@
         <h3 class="panel-title">Manage Events</h3>
     </div>
     <div class="panel-body">
+        <div class="col-md-1 col-md-offset-11">
+            <button type="button" class="btn btn-success btn-sm" ng-click="addEvent()"><span class="glyphicon glyphicon-plus"></span> Add</button>
+        </div>
         <div class="table-responsive">
             <table class="table table-striped">
                 <thead>
@@ -19,8 +22,10 @@
                         <td>{{event.topic}}</td>
                         <td>{{event.speaker}}</td>
                         <td>
-                            <button type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
-                            <button type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                            <div class="btn-group-vertical">
+                                <button type="button" class="btn btn-primary btn-sm" ng-click="editEvent(events[$index])"><span class="glyphicon glyphicon-pencil"></span> Edit</button>
+                                <button type="button" class="btn btn-danger btn-sm" ng-click="deleteEvent(events[$index])"><span class="glyphicon glyphicon-trash"></span> Delete</button>
+                            </div>
                         </td>
                     </tr>
                 </tbody>
