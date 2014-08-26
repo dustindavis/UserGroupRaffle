@@ -109,33 +109,43 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
             }
         }
 
-}]);
+    }]);
 
 //**************************[ Raffle Controller ]**************************//
-raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
-    function ($scope, registrationSvc) {
+raffleAppControllers.controller('raffleCtrl', ['$scope', '$routeParams', 'registrationSvc',
+    function ($scope, $routeParams, registrationSvc) {
         var emptyWinner = {};
         var __prizeList = [];
+        var eventid = $routeParams.eventid;
+
+        $scope.events = [];
 
         registrationSvc.getPrizes().then(function (prizes) {
             __prizeList = prizes;
         });
         registrationSvc.getEvents().then(function (events) {
             $scope.events = events;
-        });
+        }).then(function () {
+            var localEvent = $scope.events.filter(function (obj) {
+                return obj.id === eventid;
+            });
+            $scope.selectEvent(localEvent[0]);
+        }
+        );
 
         $scope.currentEvent = {
             id: 0
         };
+
         $scope.memberInputDisplay = 1;
         $scope.eventInputDisplay = false;
         $scope.currentWinner = emptyWinner;
         $scope.hasError = true;
         $scope.errorMessage = 'No entries for this raffle';
 
-        raffleEntries = [];
+        var raffleEntries = [];
 
-        createEntries = function () {
+        var createEntries = function () {
             if ($scope.currentEvent.raffleStarted === true) {
                 return;
             }
@@ -152,11 +162,12 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
 
             raffleEntries = shuffle(tmpEntries);
 
-        }
+        };
 
         var shuffle = function (array) {
             var currentIndex = array.length,
-                temporaryValue, randomIndex;
+                temporaryValue,
+                randomIndex;
 
             while (0 !== currentIndex) {
 
@@ -169,7 +180,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
             }
 
             return array;
-        }
+        };
 
         $scope.showRaffle = function () {
             return $scope.currentEvent.id != 0 && $scope.hasError == false;
@@ -190,7 +201,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
             $scope.eventInputDisplay = !$scope.eventInputDisplay;
 
             validateEvent();
-        }
+        };
 
         $scope.drawWinner = function () {
             validateEvent();
@@ -207,7 +218,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
             var position = raffleEntries.indexOf(rand);
             if (~position) raffleEntries.splice(position, 1);
 
-        }
+        };
 
         $scope.setPrize = function (prize) {
             var winner = {};
@@ -230,7 +241,7 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
             validateEvent();
 
 
-        }
+        };
 
         $scope.canDraw = function () {
 
@@ -241,9 +252,9 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
                 return false;
             }
             return !$scope.hasError;
-        }
+        };
 
-        validateEvent = function () {
+        var validateEvent = function () {
             if (raffleEntries == undefined || (raffleEntries.length == 0 && ($scope.currentEvent.winners == undefined || $scope.currentEvent.winners.length == 0))) {
                 setError('No entries for this raffle');
                 return;
@@ -262,17 +273,16 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
             }
 
             clearError();
-        }
+        };
 
-        setError = function (message) {
+        var setError = function (message) {
             $scope.hasError = true;
             $scope.errorMessage = message;
-        }
-
-        clearError = function () {
+        };
+        var clearError = function () {
             $scope.errorMessage = '';
             $scope.hasError = false;
-        }
+        };
 
         $scope.hasWinner = function (result) {
             return function (prize) {
@@ -287,15 +297,24 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', 'registrationSvc',
                     return prize.winner == undefined;
                 }
             }
-        }
+        };
 
-}]);
+        $scope.isEmpty = function (obj) {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    return false;
+                }
+
+            }
+            return true;
+        };
+
+    }]);
 
 raffleAppControllers.controller('reportsCtrl', function ($scope) {
 
 
-
-})
+});
 
 //SERVICES
 var raffleAppServices = angular.module('raffleAppServices', []);
@@ -417,26 +436,26 @@ var raffleApp = angular.module('ugRaffleApp', ['ngRoute', 'raffleAppControllers'
 
 raffleApp.config(['$routeProvider',
  function ($routeProvider) {
-        $routeProvider
-            .when('/registration', {
-                templateUrl: 'apps/registration/index.html',
-                controller: 'registrationCtrl'
-            })
-            .when('/raffle', {
-                templateUrl: 'apps/raffle/index.html',
-                controller: 'raffleCtrl'
-            })
-            .when('/setup', {
-                templateUrl: 'apps/setup/setup.html',
-                controller: 'setupCtrl'
-            })
-            .when('/reports', {
-                templateUrl: 'apps/reports/index.html',
-                controller: 'reportsCtrl'
-            })
-            .otherwise({
-                redirectTo: '/registration'
-            });
+     $routeProvider
+         .when('/registration', {
+             templateUrl: 'apps/registration/index.html',
+             controller: 'registrationCtrl'
+         })
+         .when('/raffle/:eventid', {
+             templateUrl: 'apps/raffle/index.html',
+             controller: 'raffleCtrl'
+         })
+         .when('/setup', {
+             templateUrl: 'apps/setup/setup.html',
+             controller: 'setupCtrl'
+         })
+         .when('/reports', {
+             templateUrl: 'apps/reports/index.html',
+             controller: 'reportsCtrl'
+         })
+         .otherwise({
+             redirectTo: '/registration'
+         });
  }]);
 
 var MongoDB = function (db) {

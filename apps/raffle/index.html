@@ -1,45 +1,34 @@
 
 <link href="../../css/main.css" rel="stylesheet" />
 <div class="row">
-    <!--
-            <div class="col-md-9" ng-show="hasError">
-                <h3>{{errorMessage}}</h3>
-            </div>
-    -->
-    <div class="col-md-3">
-        <h2>Raffle</h2>
-    </div>
-    <div class="col-md-9" ng-show="showRaffle()">
-        <span ng-hide="canDraw()">
-            <label>Congratulations, {{currentWinner.firstName}} {{currentWinner.lastName}}, select a prize!</label>
-        </span>
+    <div class="col-md-12">
+        <h3>Raffle for {{currentEvent.topic}}</h3>
     </div>
 </div>
 
 <div class="row">
-    <div class="col-md-10">
-        <h3>Event: {{currentEvent.topic}}</h3>
+    <!--<div class="col-md-9" ng-show="showRaffle()">-->
+    <div class="col-md-9">
+        <!--<span ng-hide="canDraw()">-->
+        <h3 ng-hide="isEmpty(currentWinner)">
+            Congratulations, {{currentWinner.firstName}} {{currentWinner.lastName}}, select a prize!
+        </h3>
         <h3 ng-show="hasError">{{errorMessage}}</h3>
     </div>
-    <div class="col-md-2 text-right">
-        <label class="btn btn-xl btn-success" ng-model="eventInputDisplay" ng-click="drawWinner()" ng-show="canDraw()">Draw Ticket!</label>
+</div>
+
+<div class="row">
+    <div class="col-md-2 col-md-offset-10 text-right">
+        <p>
+            <button type="button" class="btn btn-xl btn-success" ng-model="eventInputDisplay" ng-click="drawWinner()" ng-show="canDraw()">Draw Ticket!</button>
+        </p>
     </div>
-    <!--
-            <div class="col-md-9" ng-show="showRaffle()">
-                <div class="attendees col-md-4">
-                    <h4>Winners</h4>
-                </div>
-                <div class="attendees col-md-5">
-                    <h4>Remaining Prizes</h4>
-                </div>
-            </div>
-    -->
 </div>
 
 <div class="row">
 
 
-    <div class="col-md-3">
+    <!--<div class="col-md-3">
         <div class="btn-group">
             <label class="btn btn-sm btn-default" ng-model="eventInputDisplay" ng-click="eventInputDisplay = !eventInputDisplay">Change Event</label>
         </div>
@@ -51,13 +40,13 @@
             </li>
         </ul>
 
-    </div>
+    </div>-->
 
 
-    <div class="attendees col-md-9">
+    <div class="attendees col-md-12">
         <div class="row">
             <!-- Winners - Begin -->
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="panel panel-success">
                     <div class="panel-heading">
                         <h3 class="panel-title">Winners</h3>
@@ -75,7 +64,7 @@
             </div>
             <!-- Winners - End -->
             <!-- Prizes - Begin -->
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <h3 class="panel-title">Remaining Prizes</h3>
@@ -83,7 +72,7 @@
                     <div class="panel-body">
 
                         <ul class="list-group">
-                            <li class="list-group-item col-xs-6" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(false))" ng-click="setPrize(prize)">
+                            <li class="list-group-item col-md-6" ng-repeat="prize in (currentEvent.prizes | filter:hasWinner(false))" ng-click="setPrize(prize)">
                                 <strong>{{prize.name}}</strong>
                                 <br />{{prize.sponsor}}
                                 <span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>

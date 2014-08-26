@@ -72,16 +72,6 @@ table button {
     margin-top: 5px;
 }
 
-.prizes-list {
-    -webkit-column-count:2;   
-    -moz-column-count:2;
-    -ms-column-count:2;
-    -o-column-count:2;
-    column-count:3;
-    -webkit-column-gap:10px;   
-    -moz-column-gap:10px;
-    -ms-column-gap:10px;
-    -o-column-gap:10px;
-    column-gap:10px;
-    columns:2;
+.col-md-6:nth-child(2n+1) {
+    clear: left;
 }
