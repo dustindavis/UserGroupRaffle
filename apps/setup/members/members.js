@@ -95,6 +95,7 @@ angular.module('ugRaffleApp')
         $scope.member = modalInformation['member'];
         $scope.modalTitle = modalInformation['modalTitle'];
         $scope.modalDocument = modalInformation['modalDocument'];
+        $scope.members = modalInformation['members'];
 
         $scope.updateMember = function () {
             $modalInstance.close($scope.member);
@@ -102,6 +103,11 @@ angular.module('ugRaffleApp')
 
         $scope.createMember = function () {
             $modalInstance.close($scope.member);
+        };
+
+        $scope.selectMember = function(index) {
+            var member = $scope.members[index];
+            $modalInstance.close(member);
         };
 
     }]);

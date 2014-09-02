@@ -112,8 +112,8 @@ raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc'
     }]);
 
 //**************************[ Raffle Controller ]**************************//
-raffleAppControllers.controller('raffleCtrl', ['$scope', '$routeParams', 'registrationSvc',
-    function ($scope, $routeParams, registrationSvc) {
+raffleAppControllers.controller('raffleCtrl', ['$scope', '$routeParams', '$modal', 'registrationSvc',
+    function ($scope, $routeParams, $modal, registrationSvc) {
         var emptyWinner = {};
         var __prizeList = [];
         var eventid = $routeParams.eventid;
@@ -307,6 +307,40 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', '$routeParams', 'regist
 
             }
             return true;
+        };
+
+        $scope.passWin = function () {
+            validateEvent();
+            $scope.drawWinner();
+        };
+
+        $scope.donateWin = function () {
+
+            var allMembers = registrationSvc.__members;
+
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/modal.html',
+                controller: 'MemberModalInstanceCtrl',
+                size: 'lg',
+                resolve: {
+                    modalInformation: function () {
+                        var info = {};
+
+                        info = {
+                            members: allMembers,
+                            modalTitle: 'Select Member',
+                            modalDocument: 'apps/raffle/member-select.html'
+                        };
+
+                        return info;
+                    }
+                }
+            });
+
+            modalInstance.result
+                .then(function (member) {
+                    $scope.currentWinner = member;
+                });
         };
 
     }]);
