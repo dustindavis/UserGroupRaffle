@@ -1,6 +1,6 @@
 //SETUP
-var __MONGODB_USER = "";
-var __MONGODB_API_KEY = "";
+var __MONGODB_USER = "xxx";
+var __MONGODB_API_KEY = "xxx";
 
 
 //CONTORLLERS
@@ -345,10 +345,23 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', '$routeParams', '$modal
 
     }]);
 
-raffleAppControllers.controller('reportsCtrl', function ($scope) {
 
+//**************************[ Raffle Controller ]**************************//
+raffleAppControllers.controller('reportsCtrl', ['$scope', '$routeParams', '$modal', 'registrationSvc',
+    function ($scope, $routeParams, $modal, registrationSvc) {
+        $scope.events = [];
+        $scope.currentEvent = null;
 
-});
+        $scope.loadEvents = function () {
+            registrationSvc.getEvents().then(function (events) {
+                $scope.events = events;
+            });
+        }
+
+        $scope.loadEvents();
+        
+    }]);
+
 
 //SERVICES
 var raffleAppServices = angular.module('raffleAppServices', []);

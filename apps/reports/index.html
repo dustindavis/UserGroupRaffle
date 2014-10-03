@@ -1,3 +1,30 @@
+<h1>Reports</h1>
+
+<label>Select Event Date</label>
+<select ng-model="currentEvent" ng-options="event.date for event in events">
+    <option value="">-- Select Event --</option>
+</select>
+
+<div ng-show="currentEvent">
+    <div>
+        <label>Event Name :</label>
+        <b>{{currentEvent.topic}}</b>
+    </div>
+    <div>
+        <label>Speaker :</label>
+        <b>{{currentEvent.speaker}}</b>
+    </div>
+    
+    <h4>Winners</h4>
+    <ul ng-repeat="winner in currentEvent.winners">
+        <li>
+            <b>{{winner.prize.name}}</b> : {{winner.firstName}} {{winner.lastName}} {{winner.email}}
+        </li>
+    </ul>
+</div>
 
 
-		<h1>Reports</h1>
+
+
+<!--<hr />
+{{currentEvent}}-->
