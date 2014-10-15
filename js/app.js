@@ -1,6 +1,6 @@
 //SETUP
-var __MONGODB_USER = "xxx";
-var __MONGODB_API_KEY = "xxx";
+var __MONGODB_USER = "";
+var __MONGODB_API_KEY = "";
 
 
 //CONTORLLERS
@@ -310,9 +310,54 @@ raffleAppControllers.controller('raffleCtrl', ['$scope', '$routeParams', '$modal
         };
 
         $scope.passWin = function () {
-            validateEvent();
-            $scope.drawWinner();
+
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/modal-generic.html',
+                controller: function ($scope, $modalInstance, modalInformation) {
+                    $scope.info = modalInformation;
+
+                    $scope.ok = function () {
+                        $modalInstance.close();
+                    };
+
+                    $scope.cancel = function () {
+                        $modalInstance.dismiss('cancel');
+                    };
+                },
+                controllerAs: 'modalPassWinCtrl',
+                size: 'sm',
+                resolve: {
+                    modalInformation: function () {
+                        var info = {};
+
+                        info = {
+                            modalTitle: 'Pass Win?',
+                            modalBody: 'Are you sure you want to pass? This will remove all remaining entries.',
+                            closeButtonText: 'Cancel',
+                            actionButtonText: 'Yes'
+                        };
+
+                        return info;
+                    }
+                }
+            });
+
+            modalInstance.result
+                .then(function () {
+                    validateEvent();
+
+                    raffleEntries = filterEntries(raffleEntries, $scope.currentWinner);
+
+                    $scope.drawWinner();
+                });
+
         };
+
+        var filterEntries = function (array, entry) {
+            return array.filter(function (el) {
+                return el.id !== entry.id;
+            });
+        }
 
         $scope.donateWin = function () {
 
@@ -359,7 +404,7 @@ raffleAppControllers.controller('reportsCtrl', ['$scope', '$routeParams', '$moda
         }
 
         $scope.loadEvents();
-        
+
     }]);
 
 

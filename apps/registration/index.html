@@ -9,19 +9,24 @@
 
                 <div style="padding: 10px 0px 10px 0px;">
                     <ul class="nav nav-tabs" role="tablist">
-                        <li class="active"><a ng-model="eventInputDisplay" btn-radio="'1'" ng-click="eventInputDisplay = 1" data-toggle="tab">Events</a>
+                        <li class="active">
+                            <a ng-model="eventInputDisplay" btn-radio="'1'" ng-click="eventInputDisplay = 1" data-toggle="tab">Events</a>
                         </li>
-                        <li><a ng-model="eventInputDisplay" btn-radio="'2'" ng-click="eventInputDisplay = 2" data-toggle="tab">Create</a>
+                        <li>
+                            <a ng-model="eventInputDisplay" btn-radio="'2'" ng-click="eventInputDisplay = 2" data-toggle="tab">Create</a>
                         </li>
                     </ul>
                 </div>
 
-                <ul class="nav nav-pills nav-stacked storedMeetings" ng-show="eventInputDisplay == 1">
-                    <li ng-repeat="event in events" ng-click="selectEvent(event)" ng-class="{{$first ? 'active' : ''}}">
-                        <a data-toggle="tab">{{event.topic}} <br />{{event.date}} - {{event.speaker}}
-                        </a>
-                    </li>
-                </ul>
+                <div>
+                    <ul class="nav nav-pills nav-stacked storedMeetings" ng-show="eventInputDisplay == 1">
+                        <li ng-repeat="event in events" ng-click="selectEvent(event)" ng-class="{{$first ? 'active' : ''}}">
+                            <a data-toggle="tab">
+                                {{event.topic}} <br />{{event.date}} - {{event.speaker}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
                 <form class="form-horizontal" ng-show="eventInputDisplay == '2'" role="form">
                     <!--                    <fieldset>-->
@@ -80,9 +85,20 @@
             <div class="panel-body">
 
                 <div class="attendees col-md-6">
-                    <div class="btn-group">
+                    <!--<div class="btn-group">
                         <label class="btn btn-sm btn-default" ng-model="memberInputDisplay" btn-radio="'1'" ng-click="memberInputDisplay = 1">Members</label>
                         <label class="btn btn-sm btn-default" ng-model="memberInputDisplay" btn-radio="'2'" ng-click="memberInputDisplay = 2">New</label>
+                    </div>-->
+
+                    <div style="padding: 10px 0px 10px 0px;">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active">
+                                <a ng-model="memberInputDisplay" btn-radio="'1'" ng-click="memberInputDisplay = 1" data-toggle="tab">Members</a>
+                            </li>
+                            <li>
+                                <a ng-model="memberInputDisplay" btn-radio="'2'" ng-click="memberInputDisplay = 2" data-toggle="tab">New</a>
+                            </li>
+                        </ul>
                     </div>
 
                     <form class="form-horizontal" ng-show="memberInputDisplay == '2'">
@@ -124,10 +140,13 @@
                     </form>
 
                     <div ng-show="memberInputDisplay == '1'">
-
+                        <label>
+                            Filter: <input type="text" ng-model="memberFilter" />
+                        </label>
                         <span ng-show="(members|filter:isAttending(currentEvent.attendees)).length == 0">No more members</span>
                         <ul class="list-group members">
-                            <li class="list-group-item" ng-repeat="member in (members | filter:isAttending(currentEvent.attendees))">{{member.lastName}}, {{member.firstName}}
+                            <li class="list-group-item" ng-repeat="member in (members | filter:isAttending(currentEvent.attendees)) | filter:memberFilter">
+                                {{member.lastName}}, {{member.firstName}}
                                 <span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
                             </li>
                         </ul>
@@ -136,22 +155,27 @@
 
                 <!-- Attending Attendees - Begin -->
                 <div class="attendees col-md-6">
-                    <span ng-show="currentEvent.attendees.length == 0">No attendees</span>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Attending Members</div>
+                        <div class="panel-body">
+                            <span ng-show="currentEvent.attendees.length == 0">No attendees</span>
 
-                    <ul class="list-group attending">
-                        <li class="list-group-item" ng-repeat="attendee in currentEvent.attendees">
-                            <span class="glyphicon glyphicon-remove-circle" ng-click="removeAttendee(attendee)"></span>
-                            {{attendee.lastName}}, {{attendee.firstName}}
+                            <ul class="list-group attending">
+                                <li class="list-group-item" ng-repeat="attendee in currentEvent.attendees">
+                                    <span class="glyphicon glyphicon-remove-circle" ng-click="removeAttendee(attendee)"></span>
+                                    {{attendee.lastName}}, {{attendee.firstName}}
 
-                            <span class="pull-right">
-							<span class="glyphicon glyphicon-chevron-down" ng-click="adjustEntries(attendee,-1)"></span>
-                            <input type="text" ng-model="attendee.entries" style="width: 25px" />
-                            <span class="glyphicon glyphicon-chevron-up" ng-click="adjustEntries(attendee,1)"></span>
+                                    <span class="pull-right">
+                                        <span class="glyphicon glyphicon-chevron-down" ng-click="adjustEntries(attendee,-1)"></span>
+                                        <input type="text" ng-model="attendee.entries" style="width: 25px" />
+                                        <span class="glyphicon glyphicon-chevron-up" ng-click="adjustEntries(attendee,1)"></span>
 
-                            </span>
-                        </li>
+                                    </span>
+                                </li>
 
-                    </ul>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 <!-- Attending Attendees - End-->
             </div>

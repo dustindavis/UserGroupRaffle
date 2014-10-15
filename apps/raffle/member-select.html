@@ -1,5 +1,5 @@
 ﻿<label>
-    Filter: <input type="text" ng-model="subStrFilter" />
+    Filter: <input type="text" ng-model="memberFilter" />
 </label>
 <br />
 <table class="table table-striped">
@@ -12,11 +12,11 @@
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="m in members | filter:subStrFilter">
+        <tr ng-repeat="m in members | filter:memberFilter">
             <td>{{m.firstName}}</td>
             <td>{{m.lastName}}</td>
             <td>{{m.email}}</td>
-            <td><button type="button" class="btn btn-primary btn-sm" ng-click="selectMember($index)"><span class="glyphicon glyphicon-thumbs-up"></span> Select</button></td>
+            <td><button type="button" class="btn btn-primary btn-sm" ng-click="selectMember(m)"><span class="glyphicon glyphicon-thumbs-up"></span> Select</button></td>
         </tr>
     </tbody>
 
