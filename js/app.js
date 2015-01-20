@@ -2,413 +2,9 @@
 var __MONGODB_USER = "";
 var __MONGODB_API_KEY = "";
 
+angular.module('raffleAppControllers', []);
 
-//CONTORLLERS
-var raffleAppControllers = angular.module('raffleAppControllers', []);
-
-raffleAppControllers.controller('registrationCtrl', ['$scope', 'registrationSvc',
-    function ($scope, registrationSvc) {
-
-        $scope.members = [];
-        $scope.events = [];
-
-        registrationSvc.getMembers().then(function (members) {
-            $scope.members = members;
-        });
-        registrationSvc.getEvents().then(function (events) {
-            $scope.events = events;
-        });
-
-        $scope.currentEvent = {
-            id: 0,
-            topic: 'None'
-        };
-        $scope.memberInputDisplay = 1;
-        $scope.eventInputDisplay = 1;
-
-
-        $scope.showAttendeeList = function () {
-            return $scope.currentEvent.id != 0;
-        };
-
-        $scope.createEvent = function (newEvent) {
-            registrationSvc.addEvent(newEvent).then(function (events) {
-                $scope.events = events;
-                $scope.currentEvent = newEvent;
-                $scope.newEvent = {};
-            });
-
-        }
-
-        $scope.selectEvent = function (event) {
-            $scope.currentEvent = event;
-        }
-
-        $scope.addAttendee = function (attendee) {
-            addAttendeeToEvent(attendee);
-        }
-
-        $scope.createAttendee = function (newAttendee) {
-            addAttendeeToEvent(newAttendee);
-
-            registrationSvc.createMember(newAttendee).then(function (members) {
-                $scope.members = members;
-                $scope.newAttendee = {};
-            });
-
-        }
-
-        $scope.adjustEntries = function (attendee, value) {
-            if (isNaN(attendee.entries)) {
-                attendee.entries = 2;
-            }
-            attendee.entries += value;
-
-            if (attendee.entries < 0) {
-                attendee.entries = 0;
-            }
-            registrationSvc.updateEvent($scope.currentEvent);
-
-        }
-
-        $scope.removeAttendee = function (attendee) {
-            var position = $scope.currentEvent.attendees.indexOf(attendee);
-
-            if (~position) $scope.currentEvent.attendees.splice(position, 1);
-            registrationSvc.updateEvent($scope.currentEvent);
-
-        }
-
-        function addAttendeeToEvent(attendee) {
-            if ($scope.currentEvent == undefined || $scope.currentEvent.id == "0") {
-                return;
-            }
-            if ($scope.currentEvent.attendees == undefined) {
-                $scope.currentEvent.attendees = [];
-            }
-            attendee.entries = 2;
-            $scope.currentEvent.attendees.push(attendee);
-            registrationSvc.updateEvent($scope.currentEvent);
-
-        }
-
-        $scope.isAttending = function (attendees) {
-            return function (member) {
-
-                if (attendees == undefined) {
-                    return true;
-                }
-
-                for (var i = 0; i < attendees.length; i++) {
-                    if (attendees[i].id == member.id) {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-        }
-
-    }]);
-
-//**************************[ Raffle Controller ]**************************//
-raffleAppControllers.controller('raffleCtrl', ['$scope', '$routeParams', '$modal', 'registrationSvc',
-    function ($scope, $routeParams, $modal, registrationSvc) {
-        var emptyWinner = {};
-        var __prizeList = [];
-        var eventid = $routeParams.eventid;
-
-        $scope.events = [];
-
-        registrationSvc.getPrizes().then(function (prizes) {
-            __prizeList = prizes;
-        });
-        registrationSvc.getEvents().then(function (events) {
-            $scope.events = events;
-        }).then(function () {
-            var localEvent = $scope.events.filter(function (obj) {
-                return obj.id === eventid;
-            });
-            $scope.selectEvent(localEvent[0]);
-        }
-        );
-
-        $scope.currentEvent = {
-            id: 0
-        };
-
-        $scope.memberInputDisplay = 1;
-        $scope.eventInputDisplay = false;
-        $scope.currentWinner = emptyWinner;
-        $scope.hasError = true;
-        $scope.errorMessage = 'No entries for this raffle';
-
-        var raffleEntries = [];
-
-        var createEntries = function () {
-            if ($scope.currentEvent.raffleStarted === true) {
-                return;
-            }
-
-            var attendees = $scope.currentEvent.attendees;
-            var tmpEntries = [];
-
-            for (var i = 0; i < attendees.length; i++) {
-
-                for (var x = 0; x < attendees[i].entries; x++) {
-                    tmpEntries.push(attendees[i]);
-                }
-            }
-
-            raffleEntries = shuffle(tmpEntries);
-
-        };
-
-        var shuffle = function (array) {
-            var currentIndex = array.length,
-                temporaryValue,
-                randomIndex;
-
-            while (0 !== currentIndex) {
-
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex -= 1;
-
-                temporaryValue = array[currentIndex];
-                array[currentIndex] = array[randomIndex];
-                array[randomIndex] = temporaryValue;
-            }
-
-            return array;
-        };
-
-        $scope.showRaffle = function () {
-            return $scope.currentEvent.id != 0 && $scope.hasError == false;
-        };
-
-        $scope.selectEvent = function (event) {
-            if (event.prizes === undefined) {
-                event.prizes = __prizeList;
-            }
-
-            if (event.winners === undefined) {
-                event.winners = [];
-            }
-
-            $scope.currentEvent = event;
-
-            createEntries();
-            $scope.eventInputDisplay = !$scope.eventInputDisplay;
-
-            validateEvent();
-        };
-
-        $scope.drawWinner = function () {
-            validateEvent();
-
-            $scope.currentEvent.raffleStarted = true;
-            $scope.currentEvent.raffleCompleted = false;
-
-            var rand = raffleEntries[Math.floor(Math.random() * raffleEntries.length)];
-            var winner = {};
-            angular.copy(rand, winner);
-
-            $scope.currentWinner = winner;
-
-            var position = raffleEntries.indexOf(rand);
-            if (~position) raffleEntries.splice(position, 1);
-
-        };
-
-        $scope.setPrize = function (prize) {
-            var winner = {};
-
-            if ($scope.currentWinner === emptyWinner) {
-                return;
-            }
-
-            angular.copy($scope.currentWinner, winner);
-            winner.prize = prize;
-            $scope.currentEvent.winners.push(winner);
-
-            $scope.currentWinner = emptyWinner;
-
-            var position = $scope.currentEvent.prizes.indexOf(prize);
-            if (~position) $scope.currentEvent.prizes.splice(position, 1);
-
-
-            registrationSvc.updateEvent($scope.currentEvent);
-            validateEvent();
-
-
-        };
-
-        $scope.canDraw = function () {
-
-            if ($scope.currentEvent.raffleCompleted) {
-                return false;
-            }
-            if ($scope.currentWinner !== emptyWinner) {
-                return false;
-            }
-            return !$scope.hasError;
-        };
-
-        var validateEvent = function () {
-            if (raffleEntries == undefined || (raffleEntries.length == 0 && ($scope.currentEvent.winners == undefined || $scope.currentEvent.winners.length == 0))) {
-                setError('No entries for this raffle');
-                return;
-            }
-
-            if (raffleEntries.length == 0 && $scope.currentEvent.winners.length > 0) {
-                $scope.currentEvent.raffleCompleted = true;
-                setError('This raffle has ended!');
-                return;
-            }
-
-            if ($scope.currentEvent.prizes.length == 0) {
-                $scope.currentEvent.raffleCompleted = true;
-                setError('No more prizes left!');
-                return;
-            }
-
-            clearError();
-        };
-
-        var setError = function (message) {
-            $scope.hasError = true;
-            $scope.errorMessage = message;
-        };
-        var clearError = function () {
-            $scope.errorMessage = '';
-            $scope.hasError = false;
-        };
-
-        $scope.hasWinner = function (result) {
-            return function (prize) {
-
-                if (prize == undefined) {
-                    return false;
-                }
-
-                if (result) {
-                    return prize.winner != undefined;
-                } else {
-                    return prize.winner == undefined;
-                }
-            }
-        };
-
-        $scope.isEmpty = function (obj) {
-            for (var key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    return false;
-                }
-
-            }
-            return true;
-        };
-
-        $scope.passWin = function () {
-
-            var modalInstance = $modal.open({
-                templateUrl: 'assets/modal-generic.html',
-                controller: function ($scope, $modalInstance, modalInformation) {
-                    $scope.info = modalInformation;
-
-                    $scope.ok = function () {
-                        $modalInstance.close();
-                    };
-
-                    $scope.cancel = function () {
-                        $modalInstance.dismiss('cancel');
-                    };
-                },
-                controllerAs: 'modalPassWinCtrl',
-                size: 'sm',
-                resolve: {
-                    modalInformation: function () {
-                        var info = {};
-
-                        info = {
-                            modalTitle: 'Pass Win?',
-                            modalBody: 'Are you sure you want to pass? This will remove all remaining entries.',
-                            closeButtonText: 'Cancel',
-                            actionButtonText: 'Yes'
-                        };
-
-                        return info;
-                    }
-                }
-            });
-
-            modalInstance.result
-                .then(function () {
-                    validateEvent();
-
-                    raffleEntries = filterEntries(raffleEntries, $scope.currentWinner);
-
-                    $scope.drawWinner();
-                });
-
-        };
-
-        var filterEntries = function (array, entry) {
-            return array.filter(function (el) {
-                return el.id !== entry.id;
-            });
-        }
-
-        $scope.donateWin = function () {
-
-            var allMembers = registrationSvc.__members;
-
-            var modalInstance = $modal.open({
-                templateUrl: 'assets/modal.html',
-                controller: 'MemberModalInstanceCtrl',
-                size: 'lg',
-                resolve: {
-                    modalInformation: function () {
-                        var info = {};
-
-                        info = {
-                            members: allMembers,
-                            modalTitle: 'Select Member',
-                            modalDocument: 'apps/raffle/member-select.html'
-                        };
-
-                        return info;
-                    }
-                }
-            });
-
-            modalInstance.result
-                .then(function (member) {
-                    $scope.currentWinner = member;
-                });
-        };
-
-    }]);
-
-
-//**************************[ Raffle Controller ]**************************//
-raffleAppControllers.controller('reportsCtrl', ['$scope', '$routeParams', '$modal', 'registrationSvc',
-    function ($scope, $routeParams, $modal, registrationSvc) {
-        $scope.events = [];
-        $scope.currentEvent = null;
-
-        $scope.loadEvents = function () {
-            registrationSvc.getEvents().then(function (events) {
-                $scope.events = events;
-            });
-        }
-
-        $scope.loadEvents();
-
-    }]);
-
-
-//SERVICES
+//SERVICES  -- TODO: Should be factored out into unique services
 var raffleAppServices = angular.module('raffleAppServices', []);
 
 raffleAppServices.factory('registrationSvc',
@@ -518,43 +114,61 @@ raffleAppServices.factory('registrationSvc',
 
 );
 
-
 var raffleApp = angular.module('ugRaffleApp', ['ngRoute', 'raffleAppControllers', 'raffleAppServices', 'ui.bootstrap']);
-
-//FILTERS
-
 
 //ROUTING
 
-raffleApp.config(['$routeProvider',
- function ($routeProvider) {
-     $routeProvider
-         .when('/registration', {
-             templateUrl: 'apps/registration/index.html',
-             controller: 'registrationCtrl'
-         })
-         .when('/raffle/:eventid', {
-             templateUrl: 'apps/raffle/index.html',
-             controller: 'raffleCtrl'
-         })
-         .when('/setup', {
-             templateUrl: 'apps/setup/setup.html',
-             controller: 'setupCtrl'
-         })
-         .when('/reports', {
-             templateUrl: 'apps/reports/index.html',
-             controller: 'reportsCtrl'
-         })
-         .otherwise({
-             redirectTo: '/registration'
-         });
- }]);
+raffleApp.config(['$routeProvider', function ($routeProvider) {
+    $routeProvider
+        .when('/registration', {
+            templateUrl: 'apps/registration/registration.html',
+            controller: 'registrationCtrl'
+        })
+        .when('/raffle/:eventid', {
+            templateUrl: 'apps/raffle/raffle.html',
+            controller: 'raffleCtrl'
+        })
+        .when('/setup', {
+            templateUrl: 'apps/setup/setup.html',
+            controller: 'setupCtrl'
+        })
+        .when('/reports', {
+            templateUrl: 'apps/reports/reports.html',
+            controller: 'reportsCtrl'
+        })
+        .otherwise({
+            redirectTo: '/registration'
+        });
+}]);
+
+raffleApp.zUtilities = (function () {
+
+    var sortArray = function (array, column) {
+        return array.sort(function (a, b) {
+            return ((a[column] < b[column]) ? -1 : ((a[column] > b[column]) ? 1 : 0));
+        });
+    },
+
+    sortDateArray = function (array, column) {
+        return array.sort(function (a, b) {
+            var aDate = new Date(a[column]).toISOString().substring(0, 10);
+            var bDate = new Date(b[column]).toISOString().substring(0, 10);
+
+            return ((aDate < bDate) ? -1 : ((aDate > bDate) ? 1 : 0));
+        });
+    }
+
+    return {
+        sortArray: sortArray,
+        sortDateArray: sortDateArray
+    };
+})();
 
 var MongoDB = function (db) {
     var url = 'https://api.mongolab.com/api/1/databases/' + __MONGODB_USER + '/collections/' + db + '?apiKey=' + __MONGODB_API_KEY;
 
     return url;
-}
+};
 
 var Guid = (function () {
     function s4() {

@@ -1,14 +1,16 @@
 ﻿angular.module('ugRaffleApp')
-    .controller('navigationCtrl', ['$scope', 'EventService',
-        function ($scope, EventService) {
+    .controller('navigationCtrl', ['$scope', '$filter', 'EventService',
+        function ($scope, $filter, EventService) {
             $scope.events = [];
-
+            
             loadRemoteData();
 
             function loadRemoteData() {
+
                 EventService.getEvents()
                     .then(function (events) {
-                        setRemoteData(events);
+                        var sortedEvents = raffleApp.zUtilities.sortDateArray(events, 'date');
+                        setRemoteData(sortedEvents);
                     });
             };
 

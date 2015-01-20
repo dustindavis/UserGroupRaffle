@@ -81,7 +81,9 @@
             function loadRemoteData() {
                 EventService.getEvents()
                     .then(function (events) {
-                        setRemoteData(events);
+
+                    var sortedEvents = raffleApp.zUtilities.sortDateArray(events, 'date');
+                        setRemoteData(sortedEvents);
                     });
             };
 
@@ -123,6 +125,7 @@ angular.module('raffleAppServices')
                     $http.get(MongoDB('events'))
                         .then(function (data) {
                             self.events = data.data;
+                            localStorage.setItem('events', JSON.stringify(data.data));
                             deferred.resolve(self.events);
                         });
 

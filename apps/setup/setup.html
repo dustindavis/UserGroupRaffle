@@ -1,14 +1,14 @@
 <h1>Setup</h1>
 <link href="../../css/main.css" rel="stylesheet" />
 <div ng-controller="setupCtrl">
-    <div class="col-lg-12 ugr-vertical-tab-container">
-        <div class="col-lg-2 ugr-vertical-tab-menu">
+    <div class="col-md-12 ugr-vertical-tab-container">
+        <div class="col-md-2 ugr-vertical-tab-menu">
             <div class="list-group">
                 <a href="" class="list-group-item text-center" ng-class="{active: $index === selected}" 
                    ng-click="changeSubSection($index)" ng-repeat="section in subSections">{{section.name}}</a>
             </div>
         </div>
-        <div class="col-lg-10 ugr-vertical-tab">
+        <div class="col-md-10 ugr-vertical-tab">
             <div class="ugr-vertical-tab-content active">
                 <div ng-include="subSection.url"></div>
             </div>
