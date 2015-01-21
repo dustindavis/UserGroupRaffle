@@ -78,4 +78,11 @@ table button {
 
 .winner-options {
     margin-top: 13px;
+    text-align: right;
+}
+
+.scrollable {
+    height: auto;
+    max-height: 400px;
+    overflow-x: hidden;
 }

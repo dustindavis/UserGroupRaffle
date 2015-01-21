@@ -1,19 +1,28 @@
 
-<link href="../../css/main.css" rel="stylesheet" />
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-10">
         <h3>Raffle for {{currentEvent.topic}}</h3>
+    </div>
+    <div class="col-md-2" style="text-align: right">
+        <div class="btn-group" style="text-align:left ">
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-right" role="menu">
+                <li><a href="#">End Raffle</a></li>
+            </ul>
+        </div>
     </div>
 </div>
 
 <div class="row">
     <!--<div class="col-md-9" ng-show="showRaffle()">-->
-    <div class="col-md-9">
+    <div class="col-md-12">
         <!--<span ng-hide="canDraw()">-->
-        <div ng-hide="isEmpty(currentWinner)">
+        <div class="row" ng-hide="isEmpty(currentEvent.currentWinner)">
             <div class="col-md-9">
                 <h3>
-                    Congratulations, {{currentWinner.firstName}} {{currentWinner.lastName}}, select a prize!
+                    Congratulations, {{currentEvent.currentWinner.firstName}} {{currentEvent.currentWinner.lastName}}, select a prize!
                 </h3>
             </div>
             <div class="col-md-3 winner-options">

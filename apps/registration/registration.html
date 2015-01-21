@@ -19,7 +19,7 @@
                 </div>
 
                 <div>
-                    <ul class="nav nav-pills nav-stacked storedMeetings" ng-show="eventInputDisplay == 1">
+                    <ul class="nav nav-pills nav-stacked storedMeetings scrollable" ng-show="eventInputDisplay == 1">
                         <li ng-repeat="event in events" ng-click="selectEvent(event)" ng-class="{{$first ? 'active' : ''}}">
                             <a data-toggle="tab">
                                 {{event.topic}} <br />{{event.date}} - {{event.speaker}}
@@ -34,7 +34,7 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label" for="txtfn">Meeting Date</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" placeholder="Meeting Date" value="" ng-model="newEvent.date" />
+                            <input type="text" class="form-control" placeholder="Meeting Date" value="" ng-model="newEvent.date" required />
 
                         </div>
                     </div>
@@ -42,7 +42,7 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label" for="txtln">Speaker</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" placeholder="Speaker" value="" ng-model="newEvent.speaker" />
+                            <input type="text" class="form-control" placeholder="Speaker" value="" ng-model="newEvent.speaker" required />
 
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label" for="txtem">Topic</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" placeholder="Topic" value="" ng-model="newEvent.topic" />
+                            <input type="text" class="form-control" placeholder="Topic" value="" ng-model="newEvent.topic" required />
 
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                     <div class="form-group">
                         <label class="col-sm-4 control-label" for="txtem">Location</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" placeholder="Location" value="" ng-model="newEvent.location" />
+                            <input type="text" class="form-control" placeholder="Location" value="" ng-model="newEvent.location" required />
 
                         </div>
                     </div>
@@ -144,7 +144,7 @@
                             Filter: <input type="text" ng-model="memberFilter" />
                         </label>
                         <span ng-show="(members|filter:isAttending(currentEvent.attendees)).length == 0">No more members</span>
-                        <ul class="list-group members">
+                        <ul class="list-group members scrollable">
                             <li class="list-group-item" ng-repeat="member in (members | filter:isAttending(currentEvent.attendees)) | filter:memberFilter">
                                 {{member.lastName}}, {{member.firstName}}
                                 <span class="glyphicon glyphicon-plus-sign pull-right" ng-click="addAttendee(member)"></span>
@@ -160,7 +160,7 @@
                         <div class="panel-body">
                             <span ng-show="currentEvent.attendees.length == 0">No attendees</span>
 
-                            <ul class="list-group attending">
+                            <ul class="list-group attending scrollable">
                                 <li class="list-group-item" ng-repeat="attendee in currentEvent.attendees">
                                     <span class="glyphicon glyphicon-remove-circle" ng-click="removeAttendee(attendee)"></span>
                                     {{attendee.lastName}}, {{attendee.firstName}}
